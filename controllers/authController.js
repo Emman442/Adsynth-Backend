@@ -55,7 +55,9 @@ exports.signUp = async (req, res, next) => {
     // Check for existing user
     const userAlreadyExists = await userModel.findOne({ email });
     if (userAlreadyExists) {
-      return next(new AppError("User Already Exists, please login", 400));
+      return res.status(409).json({
+        message: "Email is already taken",
+      });
     }
 
     // Create new user
@@ -74,7 +76,7 @@ exports.signUp = async (req, res, next) => {
     });
   } catch (err) {
     // Handle errors
-    next(err);
+    return res.status(400).json({ message: "An error occurred!", error: err });
   }
 };
 
