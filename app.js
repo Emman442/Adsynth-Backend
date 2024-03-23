@@ -4,8 +4,10 @@ const session = require("express-session");
 const morgan = require("morgan")
 const mongoose = require("mongoose")
 const dotenv = require("dotenv").config()
+const cors = require("cors")
 const globalErrorHandler = require("./controllers/errorController");
 const userRouter = require("./routes/userRouter");
+const AppError = require("./utils/appError");
 const app = express();
 
 
@@ -29,7 +31,14 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use(globalErrorHandler);
 
+app.use(cors());
+// Access-Control-Allow-Origin *
+// api.natours.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.natours.com'
+// }))
 
+app.options("*", cors());
 
 
 const connectToMongoDb = () => {
@@ -67,12 +76,23 @@ passport.deserializeUser(function (obj, cb) {
 const port = process.env.PORT || 5000
 
 
+
+process.on("SIGTERM", () => {
+  console.log("👋 SIGTERM RECEIVED. Shutting down gracefully");
+  server.close(() => {
+    console.log("💥 Process terminated!");
+  });
+});
+
 app.use("/api/v1/user", userRouter)
 
+app.all("*", (req, res, next) => {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
 
-app.get("/:id", (req, res)=>{
-    res.send(`Gospel is a ${req.params.id}`)
-})
+
+
+
 app.listen(port, ()=>{
     console.log(`Adsynth Server Listening at port ${port}`)
 })
