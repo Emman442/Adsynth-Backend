@@ -5,9 +5,9 @@ const morgan = require("morgan")
 const mongoose = require("mongoose")
 const dotenv = require("dotenv").config()
 const cors = require("cors")
-const globalErrorHandler = require("./controllers/errorController");
+
 const userRouter = require("./routes/userRouter");
-const AppError = require("./utils/appError");
+
 const app = express();
 
 
@@ -29,7 +29,6 @@ app.use(function (req, res, next) {
 
 app.use(express.json());
 app.use(morgan("dev"));
-app.use(globalErrorHandler);
 
 app.use(cors());
 // Access-Control-Allow-Origin *

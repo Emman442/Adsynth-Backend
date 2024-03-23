@@ -1,8 +1,7 @@
 const userModel = require("../models/userModel");
-const AppError = require("../utils/appError");
-const catchAsync = require("../utils/catchAsync");
+
 const jwt = require("jsonwebtoken");
-const {promisify} = require("util")
+const { promisify } = require("util");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -25,27 +24,6 @@ const createSendToken = (user, statusCode, req, res) => {
     token,
   });
 };
-
-// exports.signUp = catchAsync(async (req, res, next) => {
-//   const {fullName, email, password } = req.body;
-//   const userAlreadyExists = await userModel.findOne({ email });
-//   if (userAlreadyExists) {
-//     return next(new AppError("User Already Exists, please login", 400));
-//   }
-
-//   const newUser = await userModel.create({
-//     fullName,
-//     email,
-//     password,
-//   });
-
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       newUser,
-//     },
-//   });
-// });
 
 exports.signUp = async (req, res, next) => {
   // Extract data from request body
@@ -80,26 +58,25 @@ exports.signUp = async (req, res, next) => {
   }
 };
 
-
-exports.login = catchAsync(async (req, res, next) => {
+exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return next(new AppError("Please provide email and password!", 400));
+    return res
+      .status(400)
+      .json({ message: "Please provide email and password!", error: err });
   }
 
   const user = await userModel.findOne({ email }).select("+password");
 
   if (!user || !(await user.comparePassword(password, user.password))) {
-    return next(new AppError("Incorrect email or password", 401));
+    return res.status(400).json({ message: "Incorrect email or password" });
   }
 
   createSendToken(user, 200, req, res);
-});
+};
 
-
-
-exports.protect = catchAsync(async (req, res, next) => {
+exports.protect = async (req, res, next) => {
   const testToken = req.headers.authorization;
   let token;
 
@@ -110,9 +87,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     token = req.headers.authorization.split(" ")[1];
   }
   if (!token) {
-    return next(
-      new AppError("You are not logged in!, please login to get access", 401)
-    );
+    return res
+      .status(401)
+      .json({ message: "You are not logged in!, please login to get access" });
   }
 
   const decodedToken = await promisify(jwt.verify)(
@@ -121,9 +98,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   );
   const currentUser = await userModel.findById(decodedToken.id);
   if (!currentUser) {
-    return next(
-      new AppError("The User belonging to this token does not exist!", 401)
-    );
+    return res
+      .status(401)
+      .json({ message: "The User belonging to this token does not exist!" });
   }
   const passwordChangedAfter = async function (user, JWTTimestamp) {
     if (user.passwordChangedAt) {
@@ -136,20 +113,23 @@ exports.protect = catchAsync(async (req, res, next) => {
     return false;
   };
   if (!passwordChangedAfter) {
-    return next(
-      new AppError("recently changed password, please log in again", 401)
-    );
+    return res
+      .status(401)
+      .json({ message: "recently changed password, please log in again!" });
   }
 
   req.user = currentUser;
   res.locals.user = currentUser;
   next();
-});
+};
 
-exports.forgotPassword = catchAsync(async (req, res, next) => {
+exports.forgotPassword = async (req, res, next) => {
   const user = await userModel.findOne({ email: req.body.email });
   if (!user) {
-    return next(new AppError("There is no user with email address.", 404));
+
+        return res
+          .status(404)
+          .json({ message: "There is no user with email address." });
   }
 
   const resetToken = user.createResetToken();
@@ -175,4 +155,4 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       500
     );
   }
-});
+};

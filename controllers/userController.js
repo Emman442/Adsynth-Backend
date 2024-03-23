@@ -1,9 +1,7 @@
 const userModel = require("../models/userModel")
-const AppError = require("../utils/appError")
-const catchAsync = require("../utils/catchAsync")
 
 
-exports.saveUserWebsiteDetails = catchAsync(async(req, res, next)=>{
+exports.saveUserWebsiteDetails = async(req, res, next)=>{
     const website = req.body.website
     const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {website}, {new: true})
     res.status(200).json({
@@ -12,9 +10,9 @@ exports.saveUserWebsiteDetails = catchAsync(async(req, res, next)=>{
             updatedUser
         }
     })
-})
+}
 
-exports.getUserWebsite = catchAsync(async(req, res, next)=>{
+exports.getUserWebsite = async(req, res, next)=>{
     const userId = req.user._id
     const user = await userModel.findById(req.user._id)
     const userWebsite = user.website
@@ -22,11 +20,11 @@ exports.getUserWebsite = catchAsync(async(req, res, next)=>{
         status: "success",
         data: {userWebsite}
     })
-})
-exports.AddTagSetUp= catchAsync(async(req, res, next)=>{
+}
+exports.AddTagSetUp= async(req, res, next)=>{
     
     const user = await userModel.findById(req.user._id)
-    if(user.website === null){return next(new AppError("Please provide a website to generate a tag", 400))}
+    if(user.website === null){return res.status(400).json({message:"Please provide a website to generate a tag"}) }
     const userWebsite = user.website
     const userWebTag = `<script src = '${user.website}'></script>`
     const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {userWebTag}, {new: true})
@@ -34,12 +32,12 @@ exports.AddTagSetUp= catchAsync(async(req, res, next)=>{
         status: "success",
         data: {updatedUser}
     })
-})
-exports.getTagSetUp= catchAsync(async(req, res, next)=>{
+}
+exports.getTagSetUp= async(req, res, next)=>{
     const user = await userModel.findById(req.user._id)
     const userWebsiteTag = user.userWebTag
     res.status(200).json({
         status: "success",
         data: {userWebsiteTag}
     })
-})
+}
