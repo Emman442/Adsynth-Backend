@@ -26,26 +26,57 @@ const createSendToken = (user, statusCode, req, res) => {
   });
 };
 
-exports.signUp = catchAsync(async (req, res, next) => {
-  const {fullName, email, password } = req.body;
-  const userAlreadyExists = await userModel.findOne({ email });
-  if (userAlreadyExists) {
-    return next(new AppError("User Already Exists, please login", 400));
+// exports.signUp = catchAsync(async (req, res, next) => {
+//   const {fullName, email, password } = req.body;
+//   const userAlreadyExists = await userModel.findOne({ email });
+//   if (userAlreadyExists) {
+//     return next(new AppError("User Already Exists, please login", 400));
+//   }
+
+//   const newUser = await userModel.create({
+//     fullName,
+//     email,
+//     password,
+//   });
+
+//   res.status(200).json({
+//     status: "success",
+//     data: {
+//       newUser,
+//     },
+//   });
+// });
+
+exports.signUp = async (req, res, next) => {
+  // Extract data from request body
+  const { fullName, email, password } = req.body;
+
+  try {
+    // Check for existing user
+    const userAlreadyExists = await userModel.findOne({ email });
+    if (userAlreadyExists) {
+      return next(new AppError("User Already Exists, please login", 400));
+    }
+
+    // Create new user
+    const newUser = await userModel.create({
+      fullName,
+      email,
+      password,
+    });
+
+    // Send successful response
+    res.status(200).json({
+      status: "success",
+      data: {
+        newUser,
+      },
+    });
+  } catch (err) {
+    // Handle errors
+    next(err);
   }
-
-  const newUser = await userModel.create({
-    fullName,
-    email,
-    password,
-  });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      newUser,
-    },
-  });
-});
+};
 
 
 exports.login = catchAsync(async (req, res, next) => {
