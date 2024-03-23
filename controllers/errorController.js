@@ -1,4 +1,4 @@
-const AppError = require("./../utils/appError");
+const AppError = require("../utils/appError");
 
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}.`;
@@ -27,7 +27,7 @@ const handleJWTExpiredError = () =>
 
 const sendErrorDev = (err, req, res) => {
   // A) API
-  if (req.originalUrl.startsWith("/creedlance")) {
+  if (req.originalUrl.startsWith("/api")) {
     return res.status(err.statusCode).json({
       status: err.status,
       error: err,
@@ -46,7 +46,7 @@ const sendErrorDev = (err, req, res) => {
 
 const sendErrorProd = (err, req, res) => {
   // A) API
-  if (req.originalUrl.startsWith("/creedlance")) {
+  if (req.originalUrl.startsWith("/api")) {
     // A) Operational, trusted error: send message to client
     if (err.isOperational) {
       return res.status(err.statusCode).json({
