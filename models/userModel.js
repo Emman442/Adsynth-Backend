@@ -19,6 +19,20 @@ const userSchema = new mongoose.Schema(
       required: true,
       type: String,
     },
+    website: {
+      type: String,
+      // required: true, 
+      unique: true,
+    },
+    userWebTag: {
+      type: String,
+      // required: true, 
+    },
+    completedOnboarding: {
+      type: Boolean,
+      default: false
+    },
+    
 
     passwordResetToken: String,
     passwordResetExpires: Date,

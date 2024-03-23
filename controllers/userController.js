@@ -1,12 +1,45 @@
 const userModel = require("../models/userModel")
+const AppError = require("../utils/appError")
+const catchAsync = require("../utils/catchAsync")
 
-exports.connectFacebook = catchAsync(async(req, res, next)=>{
-    const facebookId = req.body
-    const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {facebookId}, {new: true})
+
+exports.saveUserWebsiteDetails = catchAsync(async(req, res, next)=>{
+    const website = req.body.website
+    const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {website}, {new: true})
     res.status(200).json({
         status: "success",
         data: {
             updatedUser
         }
+    })
+})
+
+exports.getUserWebsite = catchAsync(async(req, res, next)=>{
+    const userId = req.user._id
+    const user = await userModel.findById(req.user._id)
+    const userWebsite = user.website
+    res.status(200).json({
+        status: "success",
+        data: {userWebsite}
+    })
+})
+exports.AddTagSetUp= catchAsync(async(req, res, next)=>{
+    
+    const user = await userModel.findById(req.user._id)
+    if(user.website === null){return next(new AppError("Please provide a website to generate a tag", 400))}
+    const userWebsite = user.website
+    const userWebTag = `<script src = '${user.website}'></script>`
+    const updatedUser = await userModel.findByIdAndUpdate(req.user._id, {userWebTag}, {new: true})
+    res.status(200).json({
+        status: "success",
+        data: {updatedUser}
+    })
+})
+exports.getTagSetUp= catchAsync(async(req, res, next)=>{
+    const user = await userModel.findById(req.user._id)
+    const userWebsiteTag = user.userWebTag
+    res.status(200).json({
+        status: "success",
+        data: {userWebsiteTag}
     })
 })
