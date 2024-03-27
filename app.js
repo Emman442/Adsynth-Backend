@@ -86,7 +86,7 @@ process.on("SIGTERM", () => {
 app.use("/api/v1/user", userRouter)
 
 app.all("*", (req, res, next) => {
-  return res.status(400).json({message: `Can't find ${req.originalUrl} on this server!`});
+  return res.status(404).json({message: `Can't find ${req.originalUrl} on this server!`});
 });
 
 
