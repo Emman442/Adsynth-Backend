@@ -22,8 +22,6 @@ const userSchema = new mongoose.Schema(
     },
     website: {
       type: String,
-      // required: true, 
-      unique: true,
     },
     userWebTag: {
       type: String,

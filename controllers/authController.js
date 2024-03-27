@@ -26,11 +26,9 @@ const createSendToken = (user, statusCode, req, res) => {
 };
 
 exports.signUp = async (req, res, next) => {
-  // Extract data from request body
   const { fullName, email, password } = req.body;
 
   try {
-    // Check for existing user
     const userAlreadyExists = await userModel.findOne({ email });
     if (userAlreadyExists) {
       return res.status(409).json({
@@ -38,14 +36,12 @@ exports.signUp = async (req, res, next) => {
       });
     }
 
-    // Create new user
     const newUser = await userModel.create({
       fullName,
       email,
       password,
     });
 
-    // Send successful response
     res.status(200).json({
       status: "success",
       data: {
@@ -53,11 +49,9 @@ exports.signUp = async (req, res, next) => {
       },
     });
   } catch (err) {
-    // Handle errors
     return res.status(400).json({ message: "An error occurred!", error: err });
   }
 };
-
 
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
@@ -88,8 +82,6 @@ exports.login = async (req, res, next) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
-
-
 
 exports.protect = async (req, res, next) => {
   const testToken = req.headers.authorization;
@@ -141,10 +133,9 @@ exports.protect = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   const user = await userModel.findOne({ email: req.body.email });
   if (!user) {
-
-        return res
-          .status(404)
-          .json({ message: "There is no user with email address." });
+    return res
+      .status(404)
+      .json({ message: "There is no user with email address." });
   }
 
   const resetToken = user.createResetToken();
