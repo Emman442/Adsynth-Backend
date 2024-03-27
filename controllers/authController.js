@@ -58,23 +58,38 @@ exports.signUp = async (req, res, next) => {
   }
 };
 
+
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  try {
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Please provide email and password!" });
+    }
+
+    const user = await userModel.findOne({ email }).select("+password");
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found." });
+    }
+
+    const passwordMatch = await user.comparePassword(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(400).json({ message: "Incorrect email or password" });
+    }
+
+    createSendToken(user, 200, req, res);
+  } catch (error) {
     return res
-      .status(400)
-      .json({ message: "Please provide email and password!", error: err });
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
-
-  const user = await userModel.findOne({ email }).select("+password");
-
-  if (!user || !(await user.comparePassword(password, user.password))) {
-    return res.status(400).json({ message: "Incorrect email or password" });
-  }
-
-  createSendToken(user, 200, req, res);
 };
+
+
 
 exports.protect = async (req, res, next) => {
   const testToken = req.headers.authorization;
