@@ -31,6 +31,22 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    facebookId: {
+      type: String,
+      unique: true
+    },
+    googleId: {
+      type: String,
+      unique: true
+    },
+    tiktokId: {
+      type: String, 
+      unique: true
+    },
+    linkedinId: {
+      type: String, 
+      unique: true,
+    },
     
 
     passwordResetToken: String,

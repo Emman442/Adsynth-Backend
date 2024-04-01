@@ -41,3 +41,48 @@ exports.getTagSetUp= async(req, res, next)=>{
         data: {userWebsiteTag}
     })
 }
+
+exports.saveUserGoogleDetails = async (req, res, next) => {
+  const { googleId } = req.body;
+
+  if (!googleId) {
+    return res.status(400).json({
+      message: "Please Input google Id",
+    });
+  }
+
+  try {
+    const user = await userModel.findByIdAndUpdate(req.user._id, {googleId}, {new: true})
+    res.status(200).json({
+        status: "success",
+        data: {
+            user
+        }
+    })
+  } catch (err) {
+    return res.status(400).json({ message: "An error occurred!", error: err });
+  }
+};
+
+exports.saveUserFacebookDetails = async (req, res, next) => {
+  const { facebookId } = req.body;
+
+  if(!facebookId){
+    return res.status(400).json({
+        message: "Please Input facebook Id"
+    })
+  }
+
+  try {
+    const user = await userModel.findByIdAndUpdate(req.user._id, {facebookId}, {new: true})
+    res.status(200).json({
+        status: "success",
+        data: {
+            user
+        }
+    })
+  } catch (err) {
+    console.log(err)
+    return res.status(400).json({ message: "An error occurred!", error: err });
+  }
+};
