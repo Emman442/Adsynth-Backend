@@ -33,10 +33,11 @@ app.use(morgan("dev"));
 // app.use(cors());
 // Access-Control-Allow-Origin *
 // api.natours.com, front-end natours.com
-app.use(cors({
-  origin: 'https://adsynth-ai.netlify.app'
-}))
+// app.use(cors({
+//   origin: 'https://adsynth-ai.netlify.app'
+// }))
 
+app.use(cors())
 app.options("*", cors());
 
 

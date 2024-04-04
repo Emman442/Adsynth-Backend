@@ -33,19 +33,19 @@ const userSchema = new mongoose.Schema(
     },
     facebookId: {
       type: String,
-      unique: true
+      // unique: true
     },
     googleId: {
       type: String,
-      unique: true
+      // unique: true
     },
     tiktokId: {
       type: String, 
-      unique: true
+      // unique: true
     },
     linkedinId: {
       type: String, 
-      unique: true,
+      // unique: true,
     },
     
 
