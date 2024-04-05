@@ -7,6 +7,8 @@ const dotenv = require("dotenv").config()
 const cors = require("cors")
 
 const userRouter = require("./routes/userRouter");
+const customerRouter = require("./routes/customerRouter");
+const campaignRouter = require("./routes/campaignRouter");
 
 const app = express();
 
@@ -85,6 +87,8 @@ process.on("SIGTERM", () => {
 });
 
 app.use("/api/v1/user", userRouter)
+app.use("/api/v1/customer", customerRouter)
+app.use("/api/v1/campaign", campaignRouter)
 
 app.all("*", (req, res, next) => {
   return res.status(404).json({message: `Can't find ${req.originalUrl} on this server!`});
